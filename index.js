@@ -7,7 +7,7 @@ import cookieParser from "cookie-parser";
 
 dotenv.config();
 
-const PORT = process.env.PORT || 5050;
+const PORT = process.env.PORT || 10000;
 const uri = process.env.ATLAS_URI;
 
 const app = express();
@@ -15,7 +15,7 @@ const app = express();
 // CORS policy
 app.use(
     cors({
-        origin: ["https://aloa-1u6p.vercel.app"],
+        origin: ["https://aloa.onrender.com"],
         methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
         credentials: true,
     })
@@ -39,3 +39,4 @@ mongoose.connect(uri,
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
+
