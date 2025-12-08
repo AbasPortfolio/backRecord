@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import mongoose from 'mongoose';
-import records from "./src/routes/record.js";
+import records from "./record.js";
 import dotenv from 'dotenv';
 import cookieParser from "cookie-parser";
 
@@ -39,3 +39,4 @@ mongoose.connect(uri,
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
+
