@@ -51,7 +51,7 @@ router.post("/register", async (req, res) => {
     // Create a token in the cookies
     res.cookie("token", userToken, {
       httpOnly: true, // Prevent JavaScript access
-      secure: false,   // Ensure the cookie is sent only over HTTPS
+      secure: true,   // Ensure the cookie is sent only over HTTPS
       sameSite: 'Lax' // Mitigate CSRF attacks
     });
 
@@ -338,6 +338,7 @@ router.delete("/appointments/:id", authMiddleware, async (req, res) => {
 
 
 export default router;
+
 
 
 
