@@ -119,7 +119,7 @@ const authMiddleware = async (req, res, next) => {
       if (err) {
         return res.status(401).json({ message: "Token is not valid" });
       }
-      const user = await User.findById(data.id);
+      const user = await User.findById(data._id);
       if (!user) {
         return res.status(401).json({ message: "Authorization denied" });
       }
@@ -335,5 +335,6 @@ router.delete("/appointments/:id", authMiddleware, async (req, res) => {
 });
 
 // ---------------------------------------------------------------------
+
 
 export default router;
