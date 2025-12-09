@@ -143,7 +143,7 @@ router.get("/secure-route", authMiddleware, (req, res) => {
 // MEDICAL RECORD MANAGEMENT ---------------------------------------------------------------------
 
 // Route to get patients from a specific user
-router.get("/users", async (req, res) => {
+router.get("/users", authMiddleware, async (req, res) => {
   try {
     const records = await MedicalRecord.find({ doctor: req.user._id });
     res.json(records);
@@ -153,7 +153,7 @@ router.get("/users", async (req, res) => {
 });
 
 // Backend endpoint - Get user info by ID
-router.get("/user/:id", async (req, res) => {
+router.get("/user/:id", authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select('-password');
     if (!user) {
@@ -173,7 +173,7 @@ function incrementCounter() {
                         const newCounter = counter * 1000;
                         return newCounter.toFixed() // Optionally return the new value
                         }
-router.post("/user/create", async (req, res) => {
+router.post("/user/create",authMiddleware, async (req, res) => {
   try {
     let newRecord = new MedicalRecord({
       patient_name: req.body.patient_name,
@@ -338,4 +338,5 @@ router.delete("/appointments/:id", authMiddleware, async (req, res) => {
 
 
 export default router;
+
 
