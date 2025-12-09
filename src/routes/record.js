@@ -107,30 +107,7 @@ router.post("/login", async (req, res) => {
 });
 
 // Middleware to verify JWT token
-const authMiddleware = async (req, res, next) => {
-  const token = req.cookies.token;
 
-  if (!token) {
-    return res.status(401).json({ message: "Authorization denied" });
-  }
-
-  try {
-    jwt.verify(token, process.env.TOKEN_KEY, async (err, data) => {
-      if (err) {
-        return res.status(401).json({ message: "Token is not valid" });
-      }
-      const user = await User.findById(data._id);
-      if (!user) {
-        return res.status(401).json({ message: "Authorization denied" });
-      }
-      req.user = user; // Store user data in req
-      next(); // Pass control to the next middleware
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Server Error");
-  }
-};
 
 // ---------------------------------------------------------------------
 
@@ -337,4 +314,5 @@ router.delete("/appointments/:id", authMiddleware, async (req, res) => {
 // ---------------------------------------------------------------------
 
 export default router;
+
 
