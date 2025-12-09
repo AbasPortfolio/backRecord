@@ -112,15 +112,13 @@ router.post("/login", async (req, res) => {
 // ---------------------------------------------------------------------
 
 // Protected route - Example
-router.get("/secure-route", authMiddleware, (req, res) => {
-  res.send("Access granted");
-});
+
 
 
 // MEDICAL RECORD MANAGEMENT ---------------------------------------------------------------------
 
 // Route to get patients from a specific user
-router.get("/users", authMiddleware, async (req, res) => {
+router.get("/users",  async (req, res) => {
   try {
     const records = await MedicalRecord.find({ doctor: req.user._id });
     res.json(records);
@@ -130,7 +128,7 @@ router.get("/users", authMiddleware, async (req, res) => {
 });
 
 // Backend endpoint - Get user info by ID
-router.get("/user/:id", authMiddleware, async (req, res) => {
+router.get("/user/:id", async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select('-password');
     if (!user) {
@@ -150,7 +148,7 @@ function incrementCounter() {
                         const newCounter = counter * 1000;
                         return newCounter.toFixed() // Optionally return the new value
                         }
-router.post("/user/create", authMiddleware, async (req, res) => {
+router.post("/user/create", async (req, res) => {
   try {
     let newRecord = new MedicalRecord({
       patient_name: req.body.patient_name,
@@ -172,7 +170,7 @@ router.post("/user/create", authMiddleware, async (req, res) => {
 });
 
 // Route to update a user
-router.patch("/users/update/:id", authMiddleware, async (req, res) => {
+router.patch("/users/update/:id", async (req, res) => {
   try {
     const updates = {
       patient_name: req.body.patient_name,
@@ -195,7 +193,7 @@ router.patch("/users/update/:id", authMiddleware, async (req, res) => {
 });
 
 // Route to update the user
-router.patch("/user/update/:id", authMiddleware, async (req, res) => {
+router.patch("/user/update/:id", async (req, res) => {
   try {
     const updates = {
       email: req.body.email,
@@ -215,7 +213,7 @@ router.patch("/user/update/:id", authMiddleware, async (req, res) => {
 });
 
 // Route to delete a user
-router.delete("/user/delete/:id", authMiddleware, async (req, res) => {
+router.delete("/user/delete/:id", async (req, res) => {
   try {
     const record = await MedicalRecord.findByIdAndDelete(req.params.id);
     if (!record) {
@@ -234,7 +232,7 @@ router.delete("/user/delete/:id", authMiddleware, async (req, res) => {
 // APPOINTMENTS RECORD MANAGEMENT ---------------------------------------------------------------------
 
 // Route for managing appointment records from a specific doctor
-router.get("/appointments", authMiddleware, async (req, res) => {
+router.get("/appointments", async (req, res) => {
   try {
     const records = await AppointmentRecord.find({ doctor: req.user._id }).populate('patient', 'email username');
     res.json(records);
@@ -244,7 +242,7 @@ router.get("/appointments", authMiddleware, async (req, res) => {
 });
 
 // Route to get an appointment record by ID
-router.get("/appointments/:id", authMiddleware, async (req, res) => {
+router.get("/appointments/:id", async (req, res) => {
   try {
     const record = await AppointmentRecord.findById(req.params.id).populate('doctor', 'email username').populate('patient', 'email username');
     if (!record) {
@@ -257,7 +255,7 @@ router.get("/appointments/:id", authMiddleware, async (req, res) => {
 });
 
 // Route to create an appointment
-router.post("/appointments/create", authMiddleware, async (req, res) => {
+router.post("/appointments/create", async (req, res) => {
   try {
     let newRecord = new AppointmentRecord({
       patient: req.body.patient,
@@ -276,7 +274,7 @@ router.post("/appointments/create", authMiddleware, async (req, res) => {
 });
 
 // Route to update an appointment
-router.patch("/appointments/update/:id", authMiddleware, async (req, res) => {
+router.patch("/appointments/update/:id", async (req, res) => {
   try {
     const updates = {
       patient: req.body.patient,
@@ -298,7 +296,7 @@ router.patch("/appointments/update/:id", authMiddleware, async (req, res) => {
 });
 
 // Route to delete an appointment
-router.delete("/appointments/:id", authMiddleware, async (req, res) => {
+router.delete("/appointments/:id", async (req, res) => {
   try {
     const record = await AppointmentRecord.findByIdAndDelete(req.params.id);
     if (!record) {
@@ -314,5 +312,6 @@ router.delete("/appointments/:id", authMiddleware, async (req, res) => {
 // ---------------------------------------------------------------------
 
 export default router;
+
 
 
