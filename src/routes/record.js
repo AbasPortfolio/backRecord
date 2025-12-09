@@ -173,7 +173,7 @@ function incrementCounter() {
                         const newCounter = counter * 1000;
                         return newCounter.toFixed() // Optionally return the new value
                         }
-router.post("/user/create",authMiddleware, async (req, res) => {
+router.post("/user/create", async (req, res) => {
   try {
     let newRecord = new MedicalRecord({
       patient_name: req.body.patient_name,
@@ -338,5 +338,6 @@ router.delete("/appointments/:id", authMiddleware, async (req, res) => {
 
 
 export default router;
+
 
 
