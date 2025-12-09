@@ -51,7 +51,7 @@ router.post("/register", async (req, res) => {
     // Create a token in the cookies
     res.cookie("token", userToken, {
       httpOnly: true, // Prevent JavaScript access
-      secure: true,   // Ensure the cookie is sent only over HTTPS
+      secure: false,   // Ensure the cookie is sent only over HTTPS
       sameSite: 'Lax' // Mitigate CSRF attacks
     });
 
@@ -107,18 +107,43 @@ router.post("/login", async (req, res) => {
 });
 
 // Middleware to verify JWT token
+const authMiddleware = async (req, res, next) => {
+  const token = req.cookies.token;
 
+  if (!token) {
+    return res.status(401).json({ message: "Authorization denied" });
+  }
+
+  try {
+    jwt.verify(token, process.env.TOKEN_KEY, async (err, data) => {
+      if (err) {
+        return res.status(401).json({ message: "Token is not valid" });
+      }
+      const user = await User.findById(data.id);
+      if (!user) {
+        return res.status(401).json({ message: "Authorization denied" });
+      }
+      req.user = user; // Store user data in req
+      next(); // Pass control to the next middleware
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
+  }
+};
 
 // ---------------------------------------------------------------------
 
 // Protected route - Example
-
+router.get("/secure-route", authMiddleware, (req, res) => {
+  res.send("Access granted");
+});
 
 
 // MEDICAL RECORD MANAGEMENT ---------------------------------------------------------------------
 
 // Route to get patients from a specific user
-router.get("/users",  async (req, res) => {
+router.get("/users", authMiddleware, async (req, res) => {
   try {
     const records = await MedicalRecord.find({ doctor: req.user._id });
     res.json(records);
@@ -128,7 +153,7 @@ router.get("/users",  async (req, res) => {
 });
 
 // Backend endpoint - Get user info by ID
-router.get("/user/:id",  async (req, res) => {
+router.get("/user/:id", authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select('-password');
     if (!user) {
@@ -148,7 +173,7 @@ function incrementCounter() {
                         const newCounter = counter * 1000;
                         return newCounter.toFixed() // Optionally return the new value
                         }
-router.post("/user/create", async (req, res) => {
+router.post("/user/create", authMiddleware, async (req, res) => {
   try {
     let newRecord = new MedicalRecord({
       patient_name: req.body.patient_name,
@@ -170,7 +195,7 @@ router.post("/user/create", async (req, res) => {
 });
 
 // Route to update a user
-router.patch("/users/update/:id", async (req, res) => {
+router.patch("/users/update/:id", authMiddleware, async (req, res) => {
   try {
     const updates = {
       patient_name: req.body.patient_name,
@@ -193,7 +218,7 @@ router.patch("/users/update/:id", async (req, res) => {
 });
 
 // Route to update the user
-router.patch("/user/update/:id", async (req, res) => {
+router.patch("/user/update/:id", authMiddleware, async (req, res) => {
   try {
     const updates = {
       email: req.body.email,
@@ -213,7 +238,7 @@ router.patch("/user/update/:id", async (req, res) => {
 });
 
 // Route to delete a user
-router.delete("/user/delete/:id", async (req, res) => {
+router.delete("/user/delete/:id", authMiddleware, async (req, res) => {
   try {
     const record = await MedicalRecord.findByIdAndDelete(req.params.id);
     if (!record) {
@@ -231,28 +256,84 @@ router.delete("/user/delete/:id", async (req, res) => {
 
 // APPOINTMENTS RECORD MANAGEMENT ---------------------------------------------------------------------
 
-
+// Route for managing appointment records from a specific doctor
+router.get("/appointments", authMiddleware, async (req, res) => {
+  try {
+    const records = await AppointmentRecord.find({ doctor: req.user._id }).populate('patient', 'email username');
+    res.json(records);
+  } catch (err) {
+    res.status(404).json({ message: 'No records found' });
+  }
+});
 
 // Route to get an appointment record by ID
-
+router.get("/appointments/:id", authMiddleware, async (req, res) => {
+  try {
+    const record = await AppointmentRecord.findById(req.params.id).populate('doctor', 'email username').populate('patient', 'email username');
+    if (!record) {
+      return res.status(404).send("Not found");
+    }
+    res.status(200).send(record);
+  } catch (err) {
+    res.status(500).send("Error fetching record");
+  }
+});
 
 // Route to create an appointment
-
+router.post("/appointments/create", authMiddleware, async (req, res) => {
+  try {
+    let newRecord = new AppointmentRecord({
+      patient: req.body.patient,
+      doctor: req.user._id,
+      appointmentDate: req.body.appointmentDate,
+      appointmentTime: req.body.appointmentTime,
+      reason: req.body.reason,
+      status: req.body.status
+    });
+    const result = await newRecord.save();
+    res.status(201).send(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error adding record");
+  }
+});
 
 // Route to update an appointment
+router.patch("/appointments/update/:id", authMiddleware, async (req, res) => {
+  try {
+    const updates = {
+      patient: req.body.patient,
+      appointmentDate: req.body.appointmentDate,
+      appointmentTime: req.body.appointmentTime,
+      reason: req.body.reason,
+      status: req.body.status
+    };
+
+    const record = await AppointmentRecord.findByIdAndUpdate(req.params.id, updates, { new: true }).populate('doctor', 'email username').populate('patient', 'email username');
+    if (!record) {
+      return res.status(404).send("No records found");
+    }
+    res.status(200).send(record);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error updating record");
+  }
+});
 
 // Route to delete an appointment
-
+router.delete("/appointments/:id", authMiddleware, async (req, res) => {
+  try {
+    const record = await AppointmentRecord.findByIdAndDelete(req.params.id);
+    if (!record) {
+      return res.status(404).send("No records found");
+    }
+    res.status(200).send(record);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error deleting record");
+  }
+});
 
 // ---------------------------------------------------------------------
 
-
 export default router;
-
-
-
-
-
-
-
-
