@@ -112,9 +112,7 @@ router.post("/login", async (req, res) => {
 // ---------------------------------------------------------------------
 
 // Protected route - Example
-router.get("/secure-route", authMiddleware, (req, res) => {
-  res.send("Access granted");
-});
+
 
 
 // MEDICAL RECORD MANAGEMENT ---------------------------------------------------------------------
@@ -250,6 +248,7 @@ router.delete("/user/delete/:id", async (req, res) => {
 
 
 export default router;
+
 
 
 
