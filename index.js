@@ -15,7 +15,7 @@ const app = express();
 // CORS policy
 app.use(
     cors({
-        origin: ["https://aloa.onrender.com"],
+        origin: ["https://ptlekalakala.onrender.com"],
         methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
         credentials: true,
     })
@@ -39,4 +39,5 @@ mongoose.connect(uri,
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
+
 
