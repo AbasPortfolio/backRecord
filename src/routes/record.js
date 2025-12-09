@@ -256,88 +256,24 @@ router.delete("/user/delete/:id", authMiddleware, async (req, res) => {
 
 // APPOINTMENTS RECORD MANAGEMENT ---------------------------------------------------------------------
 
-// Route for managing appointment records from a specific doctor
-router.get("/appointments", authMiddleware, async (req, res) => {
-  try {
-    const records = await AppointmentRecord.find({ doctor: req.user._id }).populate('patient', 'email username');
-    res.json(records);
-  } catch (err) {
-    res.status(404).json({ message: 'No records found' });
-  }
-});
+
 
 // Route to get an appointment record by ID
-router.get("/appointments/:id", authMiddleware, async (req, res) => {
-  try {
-    const record = await AppointmentRecord.findById(req.params.id).populate('doctor', 'email username').populate('patient', 'email username');
-    if (!record) {
-      return res.status(404).send("Not found");
-    }
-    res.status(200).send(record);
-  } catch (err) {
-    res.status(500).send("Error fetching record");
-  }
-});
+
 
 // Route to create an appointment
-router.post("/appointments/create", authMiddleware, async (req, res) => {
-  try {
-    let newRecord = new AppointmentRecord({
-      patient: req.body.patient,
-      doctor: req.user._id,
-      appointmentDate: req.body.appointmentDate,
-      appointmentTime: req.body.appointmentTime,
-      reason: req.body.reason,
-      status: req.body.status
-    });
-    const result = await newRecord.save();
-    res.status(201).send(result);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Error adding record");
-  }
-});
+
 
 // Route to update an appointment
-router.patch("/appointments/update/:id", authMiddleware, async (req, res) => {
-  try {
-    const updates = {
-      patient: req.body.patient,
-      appointmentDate: req.body.appointmentDate,
-      appointmentTime: req.body.appointmentTime,
-      reason: req.body.reason,
-      status: req.body.status
-    };
-
-    const record = await AppointmentRecord.findByIdAndUpdate(req.params.id, updates, { new: true }).populate('doctor', 'email username').populate('patient', 'email username');
-    if (!record) {
-      return res.status(404).send("No records found");
-    }
-    res.status(200).send(record);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Error updating record");
-  }
-});
 
 // Route to delete an appointment
-router.delete("/appointments/:id", authMiddleware, async (req, res) => {
-  try {
-    const record = await AppointmentRecord.findByIdAndDelete(req.params.id);
-    if (!record) {
-      return res.status(404).send("No records found");
-    }
-    res.status(200).send(record);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Error deleting record");
-  }
-});
+
 
 // ---------------------------------------------------------------------
 
 
 export default router;
+
 
 
 
