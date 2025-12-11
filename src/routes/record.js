@@ -45,6 +45,7 @@ router.post("/register", async (req, res) => {
       username,
       doctor
     });
+    console.log(user);
 
     const userToken = createSecretToken(user._id);
 
@@ -340,6 +341,7 @@ router.delete("/appointments/:id", async (req, res) => {
 // ---------------------------------------------------------------------
 
 export default router;
+
 
 
 
