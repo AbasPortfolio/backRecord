@@ -1,11 +1,11 @@
 import express from "express";
-import User from '../models/user_model.js';
-import MedicalRecord from '../models/medical_record_model.js';
-import AppointmentRecord from '../models/appointment_model.js';
+import User from './models/user_model.js';
+import MedicalRecord from './models/medical_record_model.js';
+import AppointmentRecord from './models/appointment_model.js';
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import { createSecretToken } from '../utils/secret_token.js';
+import { createSecretToken } from './utils/secret_token.js';
 
 dotenv.config();
 
@@ -341,6 +341,7 @@ router.delete("/appointments/:id", async (req, res) => {
 // ---------------------------------------------------------------------
 
 export default router;
+
 
 
 
