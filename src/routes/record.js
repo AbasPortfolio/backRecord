@@ -51,7 +51,7 @@ router.post("/register", async (req, res) => {
     // Create a token in the cookies
     res.cookie("token", userToken, {
       httpOnly: true, // Prevent JavaScript access
-      secure: false,   // Ensure the cookie is sent only over HTTPS
+      secure: true,   // Ensure the cookie is sent only over HTTPS
       sameSite: 'Lax' // Mitigate CSRF attacks
     });
 
@@ -90,7 +90,7 @@ router.post("/login", async (req, res) => {
     // Create a token in the cookies
     res.cookie("token", userToken, {
       httpOnly: true, // Prevent JavaScript access
-      secure: false,   // Ensure the cookie is sent only over HTTPS
+      secure: true,   // Ensure the cookie is sent only over HTTPS
       sameSite: 'Lax' // Mitigate CSRF attacks
     });
 
@@ -170,7 +170,7 @@ router.get("/user/:id",authMiddleware, async (req, res) => {
 
 // Route to create a user
 
-router.post("/user/create", async (req, res) => {
+router.post("/user/create", authMiddleware, async (req, res) => {
 
   function incrementCounter() {
                         let counter = Math.random(); // Increment the global variable
@@ -340,6 +340,7 @@ router.delete("/appointments/:id", async (req, res) => {
 // ---------------------------------------------------------------------
 
 export default router;
+
 
 
 
