@@ -107,11 +107,37 @@ router.post("/login", async (req, res) => {
 });
 
 // Middleware to verify JWT token
+const authMiddleware = async (req, res, next) => {
+  const token = req.cookies.token;
 
+  if (!token) {
+    return res.status(401).json({ message: "Authorization denied" });
+  }
+
+  try {
+    jwt.verify(token, process.env.TOKEN_KEY, async (err, data) => {
+      if (err) {
+        return res.status(401).json({ message: "Token is not valid" });
+      }
+      const user = await User.findById(data.id);
+      if (!user) {
+        return res.status(401).json({ message: "Authorization denied" });
+      }
+      req.user = user; // Store user data in req
+      next(); // Pass control to the next middleware
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
+  }
+};
 
 // ---------------------------------------------------------------------
 
 // Protected route - Example
+router.get("/secure-route", authMiddleware, (req, res) => {
+  res.send("Access granted");
+});
 
 
 
@@ -128,7 +154,7 @@ router.get("/users",  async (req, res) => {
 });
 
 // Backend endpoint - Get user info by ID
-router.get("/user/:id", async (req, res) => {
+router.get("/user/:id",authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select('-password');
     if (!user) {
@@ -170,7 +196,7 @@ router.post("/user/create", async (req, res) => {
 });
 
 // Route to update a user
-router.patch("/users/update/:id", async (req, res) => {
+router.patch("/users/update/:id",authMiddleware, async (req, res) => {
   try {
     const updates = {
       patient_name: req.body.patient_name,
@@ -193,7 +219,7 @@ router.patch("/users/update/:id", async (req, res) => {
 });
 
 // Route to update the user
-router.patch("/user/update/:id", async (req, res) => {
+router.patch("/user/update/:id",authMiddleware, async (req, res) => {
   try {
     const updates = {
       email: req.body.email,
@@ -213,7 +239,7 @@ router.patch("/user/update/:id", async (req, res) => {
 });
 
 // Route to delete a user
-router.delete("/user/delete/:id", async (req, res) => {
+router.delete("/user/delete/:id",authMiddleware, async (req, res) => {
   try {
     const record = await MedicalRecord.findByIdAndDelete(req.params.id);
     if (!record) {
@@ -312,6 +338,7 @@ router.delete("/appointments/:id", async (req, res) => {
 // ---------------------------------------------------------------------
 
 export default router;
+
 
 
 
