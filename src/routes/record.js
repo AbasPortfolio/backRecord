@@ -169,12 +169,14 @@ router.get("/user/:id",authMiddleware, async (req, res) => {
 });
 
 // Route to create a user
-function incrementCounter() {
+
+router.post("/user/create", async (req, res) => {
+
+  function incrementCounter() {
                         let counter = Math.random(); // Increment the global variable
                         const newCounter = counter * 1000;
                         return newCounter.toFixed() // Optionally return the new value
                         }
-router.post("/user/create", async (req, res) => {
   try {
     let newRecord = new MedicalRecord({
       patient_name: req.body.patient_name,
@@ -338,6 +340,7 @@ router.delete("/appointments/:id", async (req, res) => {
 // ---------------------------------------------------------------------
 
 export default router;
+
 
 
 
