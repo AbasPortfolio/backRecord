@@ -145,7 +145,7 @@ router.get("/secure-route", authMiddleware, (req, res) => {
 // MEDICAL RECORD MANAGEMENT ---------------------------------------------------------------------
 
 // Route to get patients from a specific user
-router.get("/users",  async (req, res) => {
+router.get("/users",authMiddleware,  async (req, res) => {
   try {
     const records = await MedicalRecord.find({ doctor: req.user._id });
     res.json(records);
@@ -341,6 +341,7 @@ router.delete("/appointments/:id", async (req, res) => {
 // ---------------------------------------------------------------------
 
 export default router;
+
 
 
 
